@@ -1,0 +1,110 @@
+version: '3'
+volumes:
+  apiVolume: {}
+  redisSessions: {}
+  redisCache: {}
+  mssqlAuthorizations: {}
+  mssqlLogbooksExceptions: {}
+  mssqlTransactions: {}
+  mongoHistoricHot: {}
+  mongoHistoricCool: {}
+services:
+#REDIS
+  coppelPayRedisSessions:
+    image: redis
+    container_name: coppelPayRedisSessions
+    ports:
+        - 5200:6379
+    expose:
+      - 5200
+    volumes:
+      - redisSessions:/data
+  coppelPayRedisCache:
+    image: redis
+    container_name: coppelPayRedisCache
+    ports:
+        - 5201:6379
+    expose:
+      - 5201
+    volumes:
+      - redisCache:/data
+#MSSQL
+  coppelPayMSQSQLAuthorizations:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: coppelPayMSQSQLAuthorizations
+    ports:
+        - 5300:1433
+    expose:
+      - 5300
+    volumes:
+      - mssqlAuthorizations:/var/opt
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: mssqlCoppelP@y2020
+  coppelPayMSSQLLogbooksExceptions:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: coppelPayMSSQLLogbooksExceptions
+    ports:
+        - 5301:1433
+    expose:
+      - 5301
+    volumes:
+      - mssqlLogbooksExceptions:/var/opt
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: mssqlCoppelP@y2020
+  coppelPayMSSQLTransactions:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: coppelPayMSSQLTransactions
+    ports:
+        - 5302:1433
+    expose:
+      - 5302
+    volumes:
+      - mssqlTransactions:/var/opt
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: mssqlCoppelP@y2020
+#MONGO
+  coppelPayMongoHistoricHot:
+    image: mongo:latest
+    container_name: coppelPayMongoHistoricHot
+    ports:
+        - 5400:27017 
+    expose:
+      - 5400
+    volumes:
+      - mongoHistoricHot:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: mongoCoppelP@y2020
+  coppelPayMongoHistoricCool:
+    image: mongo:latest
+    container_name: coppelPayMongoHistoricCool
+    ports:
+        - 5401:27017
+    expose:
+      - 5401
+    volumes:
+      - mongoHistoricCool:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: mongoCoppelPy@2020
+#API's
+  myApiExample:
+    image: api:v3
+    container_name: myApiExample
+    ports:
+        - 5100:5100
+    expose:
+      - 5100
+    depends_on:
+      - coppelPayRedisSessions
+      - coppelPayRedisCache
+      - coppelPayMSQSQLAuthorizations
+      - coppelPayMSSQLLogbooksExceptions
+      - coppelPayMSSQLTransactions
+      - coppelPayMongoHistoricHot
+      - coppelPayMongoHistoricCool
+    volumes:
+      - apiVolume:/opt

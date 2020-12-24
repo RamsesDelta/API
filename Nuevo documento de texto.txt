@@ -1,0 +1,6 @@
+https://www.infoq.com/articles/Multiple-Databases-with-Spring-Boot/
+
+
+https://github.com/spring-framework-guru/sfg-blog-posts/tree/master/multiple-data-sources
+
+https://springframework.guru/how-to-configure-multiple-data-sources-in-a-spring-boot-application/
